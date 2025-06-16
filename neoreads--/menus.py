@@ -16,36 +16,53 @@ def menu_inicial():
 
         if opcao == '1':
             cadastro.cadastrar()
+
         elif opcao == '2':
             cadastro.login()
+
         elif opcao == '3':
             print('Saindo...')
             break
+        
         else:
-            print('Opção inválida. Tente novamente.')
+            print('\nOpção inválida. Tente novamente.')
+            Sistema.aguardar_volta()
+            continue
 
-def menu_logado(usuario):
+def menu_logado(usuario,cadastro):
     while True:
         Sistema.limpar_tela()
         print('\n-- Menu Logado --')
         print('\n📚 1. Ver perfil de leitor')
         print('🔄 2. Atualizar dados')
         print('💡 3. Buscar bibliotecas proximas')
-        print('❗ 4. Deletar conta')
-        print('🚪 5. Sair')
+        print('📖 4. Estimativas de leitura')
+        print('❗ 5. Deletar conta')
+        print('🚪 6. Sair')
         
         opcao = input('\nDigite sua opcao: ')
 
         if opcao == '1':
             usuario.ver_perfil()
+
         elif opcao == '2':
-            pass
+            cadastro.atualizar_dados()
+
         elif opcao == '3':
             pass
+
         elif opcao == '4':
             pass
+
         elif opcao == '5':
-            saindo = ('Deseja mesmo sair? (s/n)')
+            deletado = cadastro.deletar_usuario()
+            if deletado:
+                print('Saindo...')
+                Sistema.aguardar_volta()
+                break 
+
+        elif opcao == '6':
+            saindo = input('Deseja mesmo sair? (s/n)')
             if saindo == 's':
                 print('Saindo...')
                 break
@@ -54,6 +71,7 @@ def menu_logado(usuario):
             else:
                 print('Digite (s) ou (n).')
                 pass
+
         else:
             print('Digite uma opcao valida.')
             Sistema.aguardar_volta()

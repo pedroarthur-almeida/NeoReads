@@ -126,7 +126,7 @@ class Cadastro:
 
         novo_usuario = Usuario(email=email, senha=senha, nome=nome, idade=idade, cidade=cidade, estado=estado, livrosdigitais_lidos=livrosdigitaislidos, livrosfisicos_lidos=livrosfisicoslidos, preferencia_de_leitura= preferencia, horaslidas_estudo=horasestudos,horaslidas_entretenimento=horasentretenimento, genero = genero_favorito)
         self.usuarios[email] = novo_usuario
-        print('Usuário cadastrado com sucesso!')
+        print('\nUsuário cadastrado com sucesso!')
         Sistema.aguardar_volta()
 
     def validar_nome(self, nome):
@@ -163,7 +163,7 @@ class Cadastro:
             return True
     
     def validar_idade(self, idade):
-        if idade < 0 or idade > 110:
+        if idade <= 0 or idade > 110:
             print('Idade invalida.')
             Sistema.aguardar_volta()
             return False
@@ -225,7 +225,9 @@ class Cadastro:
         
     def login(self):
         from menus import menu_logado
-        email = input('Digite seu email: ').lower().strip()
+        Sistema.limpar_tela()
+        print('Login -> Siga as instrucoes para um login bem sucedido.')
+        email = input('\nDigite seu email: ').lower().strip()
         senha = input('Digite sua senha: ')
         
         usuario = self.usuarios.get(email)
@@ -233,13 +235,164 @@ class Cadastro:
             Sistema.limpar_tela()
             print(f'Login realizado com sucesso! Bem-vindo(a), {usuario.nome}.')
             Sistema.mostrar_estatistica_leitura(usuario)
-            menu_logado(usuario)
+            menu_logado(usuario, self)
             return usuario
         else:
             print('Email ou senha incorretos.')
             Sistema.aguardar_volta()
             return None
         
+    def deletar_usuario(self):
+        while True:
+            Sistema.limpar_tela()
+            print('Como medida de seguranca, para prosseguir, e necessario que voce faca login novamente.\n')
+            email = input('Digite seu email: ')
+            senha = input('Digite sua senha: ')
+
+            usuario = self.usuarios.get(email)
+            if usuario and usuario.senha == senha:
+                confirmacao = input('\nTem certeza que deseja deletar sua conta? (s/n)').strip().lower()
+                if confirmacao == 's':
+                    del self.usuarios[email]
+                    print('\nConta deletada com sucesso.')
+                    return True
+                elif confirmacao == 'n':
+                    print('\nOperacao cancelada.')
+                    Sistema.aguardar_volta()
+                    return False
+                else:
+                    print('Preciso que digite (s) ou (n).')
+                    Sistema.aguardar_volta()
+                    continue
+            else:
+                print('Usuario ou senha incorretos.')
+                Sistema.aguardar_volta()
+                continue
+
+    def atualizar_dados(self):
+        while True:
+            Sistema.limpar_tela()
+            print('Atualização de Dados -> Faça login para continuar.\n')
+            email = input('Digite seu email: ').lower().strip()
+            senha = input('Digite sua senha: ')
+            
+            usuario = self.usuarios.get(email)
+            if usuario and usuario.senha == senha:
+                while True:
+                    Sistema.limpar_tela()
+                    print('O que você deseja atualizar?\n')
+                    print('1. Nome')
+                    print('2. Senha')
+                    print('3. Idade')
+                    print('4. Cidade')
+                    print('5. Estado')
+                    print('6. Preferência de leitura')
+                    print('7. Gênero favorito')
+                    print('8. Voltar')
+
+                    opcao = input('\nEscolha uma opção: ')
+
+                    if opcao == '1':
+                        novo_nome = input('Digite o novo nome: ')
+                        if self.validar_nome(novo_nome):
+                            usuario.nome = novo_nome
+                            print('Nome atualizado com sucesso!')
+                            Sistema.aguardar_volta()
+                        else:
+                            print('Digite um nome valido.')
+                            Sistema.aguardar_volta()
+                            continue
+
+                    elif opcao == '2':
+                        nova_senha = input('Digite a nova senha: ')
+                        if self.validar_senha(nova_senha):
+                            usuario.senha = nova_senha
+                            print('Senha atualizada com sucesso!')
+                            Sistema.aguardar_volta()
+                        else:
+                            print('Digite uma senha valida.')
+                            Sistema.aguardar_volta()
+                            continue
+
+                    elif opcao == '3':
+                        nova_idade = int(input('Digite a nova idade: '))
+                        if self.validar_idade(nova_idade):
+                            usuario.idade = nova_idade
+                            print('Idade atualizada com sucesso!')
+                            Sistema.aguardar_volta()
+                        else:
+                            print('Digite uma idade valida.')
+                            Sistema.aguardar_volta()
+                            continue
+
+                    elif opcao == '4':
+                        nova_cidade = input('Digite a nova cidade: ')
+                        if nova_cidade.replace(' ', '').isalpha():
+                            usuario.cidade = nova_cidade
+                            print('Cidade atualizada com sucesso!')
+                            Sistema.aguardar_volta()
+                        else:
+                            print('Cidade inválida.')
+                            Sistema.aguardar_volta()
+                            continue
+
+                    elif opcao == '5':
+                        novo_estado = input('Digite o novo estado (ex: PE, SP): ').upper().strip()
+                        if novo_estado in estados_brasileiros:
+                            usuario.estado = novo_estado
+                            print('Estado atualizado com sucesso!')
+                            Sistema.aguardar_volta()
+                        else:
+                            print('Estado inválido.')
+                            Sistema.aguardar_volta()
+                            continue
+
+                    elif opcao == '6':
+                        nova_preferencia = input('Digite sua nova preferência (f para físico, d para digital): ').lower().strip()
+                        if self.validar_preferenciadeleitura(nova_preferencia):
+                            usuario.preferencia_de_leitura = nova_preferencia
+                            print('Preferência atualizada com sucesso!')
+                            Sistema.aguardar_volta()
+                        else:
+                            print('Digite uma preferencia valida. (f para fisico e d para digital)')
+                            Sistema.aguardar_volta()
+                            continue
+
+                    elif opcao == '7':
+                        print('\nGêneros disponíveis:')
+                        for genero in generos_disponiveis:
+                            print(f'-> {genero.title()}')
+                        novo_genero = input('Digite seu novo gênero favorito: ').lower().strip()
+                        if novo_genero in generos_disponiveis:
+                            usuario.genero = novo_genero
+                            print('Gênero atualizado com sucesso!')
+                            Sistema.aguardar_volta()
+                        else:
+                            print('Gênero inválido.')
+                            Sistema.aguardar_volta()
+                            continue
+
+                    elif opcao == '8':
+                        print('Voltando ao menu...')
+                        Sistema.aguardar_volta()
+                        break
+                    else:
+                        print('Digite uma opção válida.')
+                        Sistema.aguardar_volta()
+                        continue
+                break  
+            
+            else:
+                print('Email ou senha incorretos.')
+                Sistema.aguardar_volta()
+                continuar = input('Deseja tentar novamente? (s/n): ').strip().lower()
+                if continuar == 'n':
+                    break
+                elif continuar == 's':
+                    continue
+                else:
+                    print('digite (s/n)')
+  
 class Usuario:
     def __init__(self, email, senha, nome, idade, cidade, estado, livrosdigitais_lidos, livrosfisicos_lidos, preferencia_de_leitura, horaslidas_estudo, horaslidas_entretenimento, genero):
         self.email = email
