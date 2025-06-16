@@ -1,18 +1,6 @@
-import os
-import platform
-
-class Sistema:
-    @staticmethod
-    def limpar_tela():
-        sistema_operacional = platform.system()
-        if sistema_operacional == "Windows":
-            os.system('cls')
-        else:
-            os.system('clear')
-
-    @staticmethod
-    def aguardar_volta():
-        input('Tecle "enter" para retornar...')
+import time
+from config import generos_disponiveis, estados_brasileiros
+from system import Sistema
 
 class Cadastro:
     def __init__(self):
@@ -20,6 +8,8 @@ class Cadastro:
 
     def cadastrar(self):
         while True:
+            Sistema.limpar_tela()
+            print('CADASTRO => Siga as instrucoes para um cadastro bem sucedido.')
             print('\n-- DADOS PESSOAIS --')
             nome = input('Digite seu nome: ')
             if self.validar_nome(nome):
@@ -37,6 +27,8 @@ class Cadastro:
         while True:        
             senha = input('Digite sua senha: ')
             if self.validar_senha(senha):
+                print('Validando...')
+                time.sleep(2)
                 break
             else:
                 continue
@@ -54,6 +46,8 @@ class Cadastro:
             estado = input('Digite seu estado, ex-(PE,RS,RJ): ').upper().strip()
             cidade = input('Digite sua cidade: ')
             if self.validar_estadocidade(estado,cidade):
+                print('Validando...')
+                time.sleep(2)
                 break
             else:
                 continue
@@ -84,14 +78,14 @@ class Cadastro:
                 print('Digite somente numeros, por favor.')
 
         while True:
-            preferencia = input('Qual sua preferencia de leitura? (livro fisico ou livro digital)').strip().lower()
+            preferencia = input('Qual sua preferencia de leitura? (f para livro fisico e d para livro digital)').strip().lower()
             if self.validar_preferenciadeleitura(preferencia):
                 break
             else:
                 continue
 
         while True:
-            horasestudos = input('Quantas horas voce dedica a leitura de livros para os seus estudos? ')
+            horasestudos = input('Quantas horas por semana voce dedica a leitura de livros para os seus estudos? ')
             if horasestudos.isdigit():
                 horasestudos = int(horasestudos)
                 if self.validar_horaslidasestudos(horasestudos):
@@ -103,10 +97,12 @@ class Cadastro:
                 continue
 
         while True:
-            horasentretenimento = input('Quantas horas voce dedica para a leitura de livros somente para o seu entretenimento? ')
+            horasentretenimento = input('Quantas horas por semana voce dedica para a leitura de livros somente para o seu entretenimento? ')
             if horasentretenimento.isdigit():
                 horasentretenimento = int(horasentretenimento)
                 if self.validar_horaslidasentretenimento(horasentretenimento):
+                    print('validando...')
+                    time.sleep(2)
                     break
                 else:
                     continue
@@ -114,9 +110,24 @@ class Cadastro:
                 print('Digite somente numeros, por favor.')
                 continue
 
-        novo_usuario = Usuario(email=email, senha=senha, nome=nome, idade=idade, cidade=cidade, estado=estado, livrosdigitais_lidos=livrosdigitaislidos, livrosfisicos_lidos=livrosfisicoslidos, preferencia_de_leitura= preferencia, horaslidas_estudo=horasestudos,horaslidas_entretenimento=horasentretenimento)
+        while True:
+            Sistema.limpar_tela()
+            print('\nAgora, preciso que escolha um genero como o seu favorito.')
+            print('-- GÊNEROS DISPONÍVEIS --\n')
+            for genero in generos_disponiveis:
+                print(f'-> {genero.title()}')
+
+            genero_favorito = input('\nDigite seu gênero favorito de leitura (como está acima): ').strip().lower()
+
+            if genero_favorito in generos_disponiveis:
+                break
+            else:
+                print('Digite um gênero válido conforme a lista acima.')
+
+        novo_usuario = Usuario(email=email, senha=senha, nome=nome, idade=idade, cidade=cidade, estado=estado, livrosdigitais_lidos=livrosdigitaislidos, livrosfisicos_lidos=livrosfisicoslidos, preferencia_de_leitura= preferencia, horaslidas_estudo=horasestudos,horaslidas_entretenimento=horasentretenimento, genero = genero_favorito)
         self.usuarios[email] = novo_usuario
         print('Usuário cadastrado com sucesso!')
+        Sistema.aguardar_volta()
 
     def validar_nome(self, nome):
         if len(nome) <= 2:
@@ -160,12 +171,11 @@ class Cadastro:
             return True
 
     def validar_estadocidade(self, estado, cidade):
-        estados_brasileiros = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO','MA', 'MT', 'MS', 'MG', 'PA', 'PB','PR', 'PE', 'PI','RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
         if estado not in estados_brasileiros:
             print('Digite um estado valido.')
             Sistema.aguardar_volta()
             return False
-        if not cidade.isalpha() or len(cidade) == 0:
+        if not cidade.replace(' ', '').isalpha() or len(cidade) == 0:
             print('Digite uma cidade valida.')
             Sistema.aguardar_volta()
             return False
@@ -189,7 +199,7 @@ class Cadastro:
             return True
     
     def validar_preferenciadeleitura(self, preferencia):
-        preferencias = ['livrofisico', 'livrodigital']
+        preferencias = ['f', 'd']
         if not preferencia in preferencias:
             print('Digite uma preferencia valida. (livro digital ou livro fisico)')
             Sistema.aguardar_volta()
@@ -214,12 +224,16 @@ class Cadastro:
             return True
         
     def login(self):
+        from menus import menu_logado
         email = input('Digite seu email: ').lower().strip()
         senha = input('Digite sua senha: ')
         
         usuario = self.usuarios.get(email)
         if usuario and usuario.senha == senha:
+            Sistema.limpar_tela()
             print(f'Login realizado com sucesso! Bem-vindo(a), {usuario.nome}.')
+            Sistema.mostrar_estatistica_leitura(usuario)
+            menu_logado(usuario)
             return usuario
         else:
             print('Email ou senha incorretos.')
@@ -227,7 +241,7 @@ class Cadastro:
             return None
         
 class Usuario:
-    def __init__(self, email, senha, nome, idade, cidade, estado, livrosdigitais_lidos, livrosfisicos_lidos, preferencia_de_leitura, horaslidas_estudo, horaslidas_entretenimento):
+    def __init__(self, email, senha, nome, idade, cidade, estado, livrosdigitais_lidos, livrosfisicos_lidos, preferencia_de_leitura, horaslidas_estudo, horaslidas_entretenimento, genero):
         self.email = email
         self.senha = senha
         self.nome = nome
@@ -239,3 +253,16 @@ class Usuario:
         self.preferencia_de_leitura = preferencia_de_leitura
         self.horaslidas_estudo = horaslidas_estudo
         self.horaslidas_entretenimento = horaslidas_entretenimento
+        self.genero = genero 
+
+    def ver_perfil(self):
+        Sistema.limpar_tela()
+        print('--- Seu Perfil de Leitor ---\n')
+        print(f'Nome: {self.nome}')
+        print(f'Idade: {self.idade}')
+        print(f'Cidade: {self.cidade} - {self.estado}')
+        print(f'Livros lidos (físicos): {self.livrosfisicos_lidos}')
+        print(f'Livros lidos (digitais): {self.livrosdigitais_lidos}')
+        print(f'Preferência de leitura: {"Físico" if self.preferencia_de_leitura == "f" else "Digital"}')
+        print(f'Gênero favorito: {self.genero.title()}')
+        Sistema.aguardar_volta()
