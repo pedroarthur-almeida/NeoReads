@@ -62,3 +62,55 @@ class Sistema:
         recomendacao = Sistema.buscar_livro(usuario.genero)
         print(recomendacao)
         Sistema.aguardar_volta()
+
+    @staticmethod
+    def buscar_bibliotecas():
+        import requests
+        import time
+
+        while True:
+            print('\n-- Buscador de Bibliotecas --')
+            cidade = input('Digite a cidade: ').strip()
+            estado = input('Digite a sigla do estado: ').strip().upper()
+
+            print(f'\n🔍 Buscando bibliotecas em {cidade}/{estado}...\n')
+            time.sleep(1)
+
+            query = f"""
+            [out:json][timeout:25];
+            area["name"="{cidade}"]["boundary"="administrative"]["admin_level"="8"]->.searchArea;
+            (
+                node["amenity"="library"](area.searchArea);
+                way["amenity"="library"](area.searchArea);
+                relation["amenity"="library"](area.searchArea);
+            );
+            out center;
+            """
+
+            try:
+                resposta = requests.post('https://overpass-api.de/api/interpreter', data=query, timeout=30)
+                if resposta.status_code == 200:
+                    bibliotecas = resposta.json().get('elements', [])
+                else:
+                    bibliotecas = []
+            except Exception as e:
+                print(f'❌ Erro ao consultar a API: {str(e)}')
+                bibliotecas = []
+
+            if bibliotecas:
+                print('✅ Bibliotecas encontradas:\n')
+                for biblioteca in bibliotecas:
+                    tags = biblioteca.get('tags', {})
+                    nome = tags.get('name', 'Biblioteca sem nome')
+                    bairro = tags.get('addr:suburb', 'Bairro não informado')
+                    rua = tags.get('addr:street', 'Rua não informada')
+
+                    print(f'📚 {nome}')
+                    print(f'🏙️ Bairro: {bairro}')
+                    print(f'📍 Rua: {rua}\n')
+            else:
+                print(f'⚠️ Nenhuma biblioteca encontrada em {cidade}/{estado}.\n')
+
+            opcao = input('Deseja buscar novamente? (s/n): ').lower()
+            if opcao != 's':
+                break

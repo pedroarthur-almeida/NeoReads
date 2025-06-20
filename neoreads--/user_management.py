@@ -1,6 +1,7 @@
 import time
 from config import generos_disponiveis, estados_brasileiros
 from system import Sistema
+from prompt_toolkit import prompt
 
 class Cadastro:
     def __init__(self):
@@ -9,8 +10,9 @@ class Cadastro:
     def cadastrar(self):
         while True:
             Sistema.limpar_tela()
-            print('CADASTRO => Siga as instrucoes para um cadastro bem sucedido.')
-            print('\n-- DADOS PESSOAIS --')
+            print('(CADASTRO)')
+            print('=> Siga as instrucoes para um cadastro bem sucedido.')
+            print('\n(DADOS PESSOAIS)')
             nome = input('Digite seu nome: ')
             if self.validar_nome(nome):
                 break
@@ -25,7 +27,7 @@ class Cadastro:
                 continue
 
         while True:        
-            senha = input('Digite sua senha: ')
+            senha = prompt('Digite sua senha: ', is_password = True)
             if self.validar_senha(senha):
                 print('Validando...')
                 time.sleep(2)
@@ -78,7 +80,7 @@ class Cadastro:
                 print('Digite somente numeros, por favor.')
 
         while True:
-            preferencia = input('Qual sua preferencia de leitura? (f para livro fisico e d para livro digital)').strip().lower()
+            preferencia = input('Qual sua preferencia de leitura? (f para livro fisico e d para livro digital) ').strip().lower()
             if self.validar_preferenciadeleitura(preferencia):
                 break
             else:
@@ -126,12 +128,12 @@ class Cadastro:
 
         novo_usuario = Usuario(email=email, senha=senha, nome=nome, idade=idade, cidade=cidade, estado=estado, livrosdigitais_lidos=livrosdigitaislidos, livrosfisicos_lidos=livrosfisicoslidos, preferencia_de_leitura= preferencia, horaslidas_estudo=horasestudos,horaslidas_entretenimento=horasentretenimento, genero = genero_favorito)
         self.usuarios[email] = novo_usuario
-        print('\nUsuário cadastrado com sucesso!')
+        print('\nConta criada com sucesso! Por segurança, faça login para começar a usar.\n')
         Sistema.aguardar_volta()
 
     def validar_nome(self, nome):
         if len(nome) <= 2:
-            print('Nome muito curto.')
+            print('ERRO: Nome muito curto.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -139,16 +141,16 @@ class Cadastro:
 
     def validar_email(self, email):
         if email in self.usuarios:
-            print('Esse email ja foi cadastrado.')
+            print('ERRO: Esse email ja foi cadastrado.')
             Sistema.aguardar_volta()
             return False
         elif '@' not in email or '.com' not in email:
-            print('Digite um email valido. O email precisa ter ".com" e "@".')
+            print('ERRO: Digite um email valido. O email precisa ter ".com" e "@".')
             Sistema.aguardar_volta()
             return False
         dominios_validos = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'icloud.com']
         if not any(email.endswith(dominio) for dominio in dominios_validos):
-            print('Dominio invalido! Use: Gmail, Outlook, Hotmail, Yahoo ou iCloud.')
+            print('ERRO: Dominio invalido! Use: Gmail, Outlook, Hotmail, Yahoo ou iCloud.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -156,7 +158,7 @@ class Cadastro:
         
     def validar_senha(self, senha):
         if len(senha) < 6:
-            print('Sua senha precisa ter, no minimo, 6 caracteres.')
+            print('ERRO: Sua senha precisa ter, no minimo, 6 caracteres.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -164,7 +166,7 @@ class Cadastro:
     
     def validar_idade(self, idade):
         if idade <= 0 or idade > 110:
-            print('Idade invalida.')
+            print('ERRO: Idade invalida.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -172,11 +174,11 @@ class Cadastro:
 
     def validar_estadocidade(self, estado, cidade):
         if estado not in estados_brasileiros:
-            print('Digite um estado valido.')
+            print('ERRO: Digite um estado valido.')
             Sistema.aguardar_volta()
             return False
         if not cidade.replace(' ', '').isalpha() or len(cidade) == 0:
-            print('Digite uma cidade valida.')
+            print('ERRO: Digite uma cidade valida.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -184,7 +186,7 @@ class Cadastro:
 
     def validar_livrosdigitaislidos(self, livrosdigitaislidos):
         if int(livrosdigitaislidos) < 0:
-            print('Numero invalido de livros.')
+            print('ERRO: Numero invalido de livros.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -192,7 +194,7 @@ class Cadastro:
 
     def validar_livrosfisicoslidos(self, livrosfisicoslidos):
         if int(livrosfisicoslidos) < 0:
-            print('Numero invalido de livros.')
+            print('ERRO: Numero invalido de livros.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -201,7 +203,7 @@ class Cadastro:
     def validar_preferenciadeleitura(self, preferencia):
         preferencias = ['f', 'd']
         if not preferencia in preferencias:
-            print('Digite uma preferencia valida. (livro digital ou livro fisico)')
+            print('ERRO: Digite uma preferencia valida. (livro digital ou livro fisico)')
             Sistema.aguardar_volta()
             return False
         else:
@@ -209,7 +211,7 @@ class Cadastro:
 
     def validar_horaslidasestudos(self, horasestudos):
         if horasestudos < 0:
-            print('Digite horas validas.')
+            print('ERRO: Digite horas validas.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -217,7 +219,7 @@ class Cadastro:
 
     def validar_horaslidasentretenimento(self, horasentretenimento):
         if horasentretenimento < 0:
-            print('Digite horas validas.')
+            print('ERRO: Digite horas validas.')
             Sistema.aguardar_volta()
             return False
         else:
@@ -238,7 +240,7 @@ class Cadastro:
             menu_logado(usuario, self)
             return usuario
         else:
-            print('Email ou senha incorretos.')
+            print('ERRO: Email ou senha incorretos.')
             Sistema.aguardar_volta()
             return None
         
@@ -261,11 +263,11 @@ class Cadastro:
                     Sistema.aguardar_volta()
                     return False
                 else:
-                    print('Preciso que digite (s) ou (n).')
+                    print('ERRO: Preciso que digite (s) ou (n).')
                     Sistema.aguardar_volta()
                     continue
             else:
-                print('Usuario ou senha incorretos.')
+                print('ERRO: Usuario ou senha incorretos.')
                 Sistema.aguardar_volta()
                 continue
 
@@ -391,7 +393,7 @@ class Cadastro:
                 elif continuar == 's':
                     continue
                 else:
-                    print('digite (s/n)')
+                    print('ERRO: digite (s/n)')
   
 class Usuario:
     def __init__(self, email, senha, nome, idade, cidade, estado, livrosdigitais_lidos, livrosfisicos_lidos, preferencia_de_leitura, horaslidas_estudo, horaslidas_entretenimento, genero):
@@ -410,12 +412,100 @@ class Usuario:
 
     def ver_perfil(self):
         Sistema.limpar_tela()
-        print('--- Seu Perfil de Leitor ---\n')
+        print('(Seu Perfil de Leitor)\n')
         print(f'Nome: {self.nome}')
         print(f'Idade: {self.idade}')
         print(f'Cidade: {self.cidade} - {self.estado}')
         print(f'Livros lidos (físicos): {self.livrosfisicos_lidos}')
         print(f'Livros lidos (digitais): {self.livrosdigitais_lidos}')
         print(f'Preferência de leitura: {"Físico" if self.preferencia_de_leitura == "f" else "Digital"}')
-        print(f'Gênero favorito: {self.genero.title()}')
+        print(f'Gênero favorito: {self.genero.title()}\n')
         Sistema.aguardar_volta()
+
+    def calcular_estimativas(self, livrosdigitais_lidos, livrosfisicos_lidos):
+        while True:
+            Sistema.limpar_tela()
+            print('(Menu de estimativas)')
+            print(f'\n1. Estimativas gerais (livros totais lidos)')
+            print('2. Estimativas para os proximos 5 anos')
+            print('3. Estimativas por ano (entretenimento e estudo)')
+            print('4. Voltar')
+
+            total_lidos = livrosdigitais_lidos + livrosfisicos_lidos
+
+            opcao = input('\nDigite sua opcao: ')
+
+            if opcao == '1':
+                print(f'\nParabens! no ultimo ano voce leu {total_lidos} livros.')
+
+                if total_lidos <= 3:
+                    print(f'Excelente! Você está no caminho certo. Meus parabens por ler {total_lidos} livros.\nCada página conta! Fico na torcida para você continuar aprimorando seu hábito de leitura')
+                    Sistema.aguardar_volta()
+                    continue
+
+                elif 3 < total_lidos <= 10:
+                    print(f'Mandou bem! {total_lidos} livros lidos, você mantém um ótimo ritmo de leitura e está com a leitura em dia.\nQue tal explorar novos gêneros ou aprofundar-se nos seus favoritos para expandir ainda mais seus horizontes?')
+                    Sistema.aguardar_volta()
+                    continue
+
+                elif 10 < total_lidos <= 25:
+                    print(f'Muito bom! {total_lidos} livros, que demais! Seu ritmo de leitura é consistente e você está mantendo seus hábitos em dia.\nEssa dedicação já abre portas para muitos novos conhecimentos e histórias.\nContinue aproveitando cada momento com os livros!')
+                    Sistema.aguardar_volta()
+                    continue
+
+                else:
+                    print(f'Incrível! {total_lidos} livros definitivamente nao sao para qualquer um. Você é um verdadeiro leitor nato!\nSua paixão pelos livros é uma fonte inesgotável de conhecimento e novas perspectivas.\nContinue mergulhando nessa jornada literária; cada página é um presente que você dá a si mesmo.')
+                    Sistema.aguardar_volta()
+                    continue
+
+            elif opcao == '2':
+                    
+                    estimativa = total_lidos * 5
+
+                    if estimativa >= 200:
+                        print(f"\nUau! Se você mantiver o ritmo atual, você pode ler incríveis {estimativa} livros nos próximos 5 anos!")
+                        print("Seja para lazer ou estudo, seu comprometimento é inspirador. Continue assim!")
+                        Sistema.aguardar_volta()
+                        continue
+
+                    elif estimativa >= 50:
+                        print(f"\nÓtimo! Mantendo o ritmo, você tem a chance de ler cerca de {estimativa} livros nos próximos 5 anos.")
+                        print("É um excelente progresso, tanto para enriquecimento pessoal quanto acadêmico. Continue firme!")
+                        Sistema.aguardar_volta()
+                        continue
+
+                    else:
+                        print(f"\nSeu ritmo atual projeta cerca de {estimativa} livros nos próximos 5 anos.")
+                        print("Que tal buscar alguns novos títulos para entretenimento ou explorar um tema novo para seus estudos?\nPequenos passos fazem a diferença!")
+                        Sistema.aguardar_volta()
+                        continue
+
+            elif opcao == '3':
+                print('\n(HORAS DEDICADAS AO ESTUDO)')
+                estimando = self.horaslidas_estudo * 52
+                print(f'Se você mantiver esse ritmo, a estimativa é de que você leia cerca de {estimando} livros/materiais de estudo nos próximos 5 anos.\nIsso é um investimento contínuo e poderoso no seu conhecimento e futuro!')
+                
+                print('\n HORAS DEDICADAS A ENTRETENIMENTO')
+                estimando2 = self.horaslidas_entretenimento * 52
+                print(f'Se você continuar nesse ritmo, a estimativa é que você devore aproximadamente {estimando2} livros de puro entretenimento nos próximos 5 anos.\nPrepare-se para embarcar em incontáveis aventuras, mergulhar em mundos fantásticos e desfrutar de horas de lazer garantido!')
+
+                Sistema.aguardar_volta()
+                continue
+
+            elif opcao == '4':
+                break
+
+            else:
+                print('ERRO: Digite uma opcao valida. (1-3)')
+                Sistema.aguardar_volta()
+                continue
+
+
+           
+                
+
+            
+
+            
+
+            

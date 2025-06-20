@@ -7,12 +7,12 @@ sistema = Sistema()
 def menu_inicial():
      while True:
         Sistema.limpar_tela()
-        print('\n-- Menu Inicial --')
-        print('\n1. Cadastrar novo usuário')
-        print('2. Login')
-        print('3. Sair')
+        print('(MENU INICIAL)')
+        print('\n📝 1. Cadastrar novo usuário')
+        print('👤 2. Login')
+        print('🚪 3. Sair')
 
-        opcao = input('\nEscolha uma opção: ')
+        opcao = input('\nDigite uma opção: ')
 
         if opcao == '1':
             cadastro.cadastrar()
@@ -32,7 +32,7 @@ def menu_inicial():
 def menu_logado(usuario,cadastro):
     while True:
         Sistema.limpar_tela()
-        print('\n-- Menu Logado --')
+        print('(Menu Logado)')
         print('\n📚 1. Ver perfil de leitor')
         print('🔄 2. Atualizar dados')
         print('💡 3. Buscar bibliotecas proximas')
@@ -49,10 +49,11 @@ def menu_logado(usuario,cadastro):
             cadastro.atualizar_dados()
 
         elif opcao == '3':
-            pass
+            Sistema.buscar_bibliotecas()
+            Sistema.aguardar_volta()
 
         elif opcao == '4':
-            pass
+            usuario.calcular_estimativas(usuario.livrosdigitais_lidos, usuario.livrosfisicos_lidos)
 
         elif opcao == '5':
             deletado = cadastro.deletar_usuario()
